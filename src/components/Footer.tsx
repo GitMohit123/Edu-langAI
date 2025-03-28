@@ -162,12 +162,12 @@ export default function Footer() {
                   </div>
 
                   <div className="hidden md:block md:w-1/3">
-                    <div className="relative h-40 w-40 mx-auto">
+                    <div className="relative h-56 w-56 mx-auto">
                       <Image
-                        src="/placeholder.svg?height=160&width=160&text=Newsletter"
+                        src="/assets/newsletter.png"
                         alt="Newsletter illustration"
-                        width={160}
-                        height={160}
+                        width={260}
+                        height={260}
                         className="object-contain"
                       />
                     </div>
