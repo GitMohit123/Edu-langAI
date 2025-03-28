@@ -190,10 +190,10 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center space-x-4">
           <Button asChild variant="outline" className="border-gray-200 text-gray-700 hover:bg-gray-50">
-            <Link href="/signin">Sign In</Link>
+            <Link href="/auth/login">Sign In</Link>
           </Button>
           <Button asChild className="bg-primary-600 hover:bg-primary-700 text-white">
-            <Link href="/signup">Get Started</Link>
+            <Link href="/auth/signup">Get Started</Link>
           </Button>
         </div>
 
