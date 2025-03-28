@@ -32,10 +32,7 @@ export function Sidebar({ role }: SidebarProps) {
 
   const professorLinks = [
     { href: "/dashboard/professor", label: "Dashboard", icon: Home },
-    { href: "/dashboard/professor/classes", label: "My Classes", icon: BookOpen },
-    { href: "/dashboard/professor/materials", label: "Materials", icon: FileText },
     { href: "/dashboard/professor/upload", label: "Upload", icon: FileUp },
-    { href: "/dashboard/professor/students", label: "Students", icon: Users },
     { href: "/dashboard/professor/settings", label: "Settings", icon: Settings },
   ]
 
