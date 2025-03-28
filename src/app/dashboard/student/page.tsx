@@ -77,10 +77,7 @@ export default function StudentDashboardPage() {
     }, 5000)
   }
 
-  const handleJoinClassSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!classCode.trim()) return
-
+  const handleJoinClassSubmit = () => {
     setIsJoinModalOpen(true)
   }
 
@@ -91,10 +88,13 @@ export default function StudentDashboardPage() {
           <h1 className="text-3xl font-bold tracking-tight">Student Dashboard</h1>
           <p className="text-gray-500">Welcome back, Jane! Here are your classes and recent materials.</p>
         </div>
+        <Button variant="outline" onClick={handleJoinClassSubmit} className="py-4 mr-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
+        <BookOpen className="h-4 w-4 mr-2" />Join a Class
+          </Button>
       </div>
 
       {/* Join Class Card */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Join a Class</CardTitle>
           <CardDescription>Enter the class code provided by your professor</CardDescription>
@@ -113,7 +113,7 @@ export default function StudentDashboardPage() {
             </Button>
           </form>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Stats overview */}
       <div className="grid gap-4 md:grid-cols-3">

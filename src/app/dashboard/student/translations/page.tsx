@@ -166,7 +166,7 @@ export default function StudentTranslationsPage() {
           <p className="text-gray-500">View and manage your translated learning materials</p>
         </div>
         <div className="flex items-center">
-          <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)} className="py-4 mr-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
+          <Button variant="outline" onClick={() => setDialogOpen(true)} className="mr-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
             <Sparkles className="h-6 w-6 mr-2" />
             Translate New Material
           </Button>
