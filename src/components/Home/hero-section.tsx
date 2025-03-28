@@ -184,7 +184,7 @@ export default function HeroSection() {
 
           <motion.div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center" variants={itemVariants}>
             <Button asChild size="lg" className="px-8 bg-primary-600 hover:bg-primary-700 text-white font-medium group">
-              <Link href="/signup" className="flex items-center">
+              <Link href="/auth/signup" className="flex items-center">
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
