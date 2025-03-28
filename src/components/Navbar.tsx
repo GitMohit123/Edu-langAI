@@ -14,18 +14,9 @@ const featuresList = [
   { name: "Language Translation", href: "#language-translation" },
   { name: "Text to Speech", href: "#text-to-speech" },
   { name: "Text Summarization", href: "#text-summarization" },
-  { name: "Teacher Uploads", href: "#teacher-uploads" },
-  { name: "Student Downloads", href: "#student-downloads" },
-  { name: "AI Assistant", href: "#ai-assistant" },
   { name: "Learning Analytics", href: "#learning-analytics" },
-  { name: "Personalized Learning", href: "#personalized-learning" },
 ]
 
-// Solutions list for dropdown
-const solutionsList = [
-  { name: "Teacher Interface", href: "#teacher-interface" },
-  { name: "Student Interface", href: "#student-interface" },
-]
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -143,7 +134,7 @@ export default function Navbar() {
           </div>
 
           {/* Solutions dropdown */}
-          <div className="relative" ref={solutionsRef}>
+          {/* <div className="relative" ref={solutionsRef}>
             <NavLink href="#" onClick={toggleSolutions}>
               <div className="flex items-center">
                 Solutions
@@ -175,16 +166,10 @@ export default function Navbar() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div> */}
 
           <NavLink href="#pricing" onClick={(e) => handleScroll(e, "pricing")}>
             Pricing
-          </NavLink>
-          <NavLink href="#team" onClick={(e) => handleScroll(e, "team")}>
-            Team
-          </NavLink>
-          <NavLink href="#contact" onClick={(e) => handleScroll(e, "contact")}>
-            Contact
           </NavLink>
         </nav>
 
@@ -242,7 +227,7 @@ export default function Navbar() {
               </div>
 
               {/* Mobile Solutions dropdown */}
-              <div>
+              {/* <div>
                 <button
                   className="flex items-center justify-between w-full text-sm font-medium text-gray-700 hover:text-primary-700 transition-colors px-2 py-1 rounded-md hover:bg-primary-50"
                   onClick={toggleSolutions}
@@ -273,17 +258,17 @@ export default function Navbar() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </div> */}
 
               <MobileNavLink href="#pricing" onClick={(e) => handleScroll(e, "pricing")}>
                 Pricing
               </MobileNavLink>
-              <MobileNavLink href="#team" onClick={(e) => handleScroll(e, "team")}>
+              {/* <MobileNavLink href="#team" onClick={(e) => handleScroll(e, "team")}>
                 Team
               </MobileNavLink>
               <MobileNavLink href="#contact" onClick={(e) => handleScroll(e, "contact")}>
                 Contact
-              </MobileNavLink>
+              </MobileNavLink> */}
               <div className="flex items-center space-x-4 pt-2">
                 <Button asChild className="flex-1 bg-primary-600 hover:bg-primary-700 text-white">
                   <Link href="/signup">Get Started</Link>
