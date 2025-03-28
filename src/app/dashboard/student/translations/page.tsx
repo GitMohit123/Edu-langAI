@@ -162,7 +162,7 @@ export default function StudentTranslationsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Translations</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-primary-600">My Translations</h1>
           <p className="text-gray-500">View and manage your translated learning materials</p>
         </div>
         <div className="flex items-center">
@@ -278,10 +278,10 @@ export default function StudentTranslationsPage() {
                       <Calendar className="h-4 w-4 text-gray-500 mr-2" />
                       <span className="text-gray-700">Translated: {material.translationDate}</span>
                     </div>
-                    <div className="flex items-center text-sm">
+                    {/* <div className="flex items-center text-sm">
                       <Clock className="h-4 w-4 text-gray-500 mr-2" />
                       <span className="text-gray-700">Last viewed: {material.lastViewed}</span>
-                    </div>
+                    </div> */}
 
                     <div className="flex justify-between items-center pt-4">
                       <span className="text-sm text-gray-500">{material.size}</span>

@@ -39,7 +39,7 @@ export function Sidebar({ role }: SidebarProps) {
   const studentLinks = [
     { href: "/dashboard/student", label: "Dashboard", icon: Home },
     { href: "/dashboard/student/classes", label: "My Classes", icon: BookOpen },
-    { href: "/dashboard/student/materials", label: "Materials", icon: FileText },
+    // { href: "/dashboard/student/materials", label: "Materials", icon: FileText },
     { href: "/dashboard/student/translations", label: "Translations", icon: BookMarked },
     { href: "/dashboard/student/audio", label: "Text to Speech", icon: Headphones },
     { href: "/dashboard/student/settings", label: "Settings", icon: Settings },

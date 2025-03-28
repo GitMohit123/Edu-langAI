@@ -155,7 +155,7 @@ export default function StudentClassDetailPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">{currentClass.name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-primary-600">{currentClass.name}</h1>
           </div>
           <p className="text-gray-500">Professor: {currentClass.professor}</p>
         </div>

@@ -85,7 +85,7 @@ export default function StudentDashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Student Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-primary-600">Student Dashboard</h1>
           <p className="text-gray-500">Welcome back, Jane! Here are your classes and recent materials.</p>
         </div>
         <Button variant="outline" onClick={handleJoinClassSubmit} className="py-4 mr-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
@@ -145,123 +145,6 @@ export default function StudentDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{classes.reduce((acc, cls) => acc + cls.newMaterials, 0)}</div>
             <p className="text-xs text-gray-500">New documents in the last week</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enrolled Classes */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Your Classes</h2>
-          <Link href="/dashboard/student/classes" className="text-sm text-primary-600 hover:text-primary-700">
-            View all
-          </Link>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {classes.map((cls) => (
-            <motion.div
-              key={cls.id}
-              whileHover={{ y: -5 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              animate={{
-                backgroundColor:
-                  recentlyJoinedClass === cls.id ? ["#f0f9ff", "#ffffff", "#f0f9ff", "#ffffff"] : "#ffffff",
-                transition: { duration: 2, repeat: 2 },
-              }}
-              className="rounded-lg overflow-hidden"
-            >
-              <Card className="h-full">
-                <CardHeader className="bg-primary-50 pb-2">
-                  <CardTitle>{cls.name}</CardTitle>
-                  <CardDescription>Professor: {cls.professor}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Materials</span>
-                      <span className="font-medium">{cls.materials}</span>
-                    </div>
-                    {cls.newMaterials > 0 && (
-                      <div className="flex items-center">
-                        <Badge className="bg-primary-500">
-                          {cls.newMaterials} new {cls.newMaterials === 1 ? "material" : "materials"}
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t bg-gray-50 px-6 py-3">
-                  <Link
-                    href={`/dashboard/student/classes/${cls.id}`}
-                    className="flex w-full items-center justify-center text-sm font-medium text-primary-600 hover:text-primary-700"
-                  >
-                    View Class
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
-
-          {/* Join class card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-            <Card className="flex h-full flex-col items-center justify-center border-2 border-dashed border-gray-200 p-6 text-center">
-              <div className="mb-4 rounded-full bg-primary-50 p-3">
-                <Plus className="h-6 w-6 text-primary-600" />
-              </div>
-              <h3 className="mb-1 font-medium">Join Another Class</h3>
-              <p className="mb-4 text-sm text-gray-500">Enter a class code to join a new class</p>
-              <Button onClick={() => setIsJoinModalOpen(true)} variant="outline" className="mt-2">
-                Enter Class Code
-              </Button>
-            </Card>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Recent Materials */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Recent Materials</h2>
-          <Link href="/dashboard/student/materials" className="text-sm text-primary-600 hover:text-primary-700">
-            View all
-          </Link>
-        </div>
-        <Card>
-          <CardContent className="p-0">
-            <div className="divide-y">
-              {recentMaterials.map((material) => (
-                <div key={material.id} className="flex items-start gap-4 p-4">
-                  <div className="rounded-full bg-primary-50 p-2">
-                    <FileText className="h-4 w-4 text-primary-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{material.name}</p>
-                      <Badge variant="outline" className="uppercase">
-                        {material.type}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-500">{material.class}</p>
-                    <p className="text-xs text-gray-400">Uploaded {material.uploaded}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                      <span className="sr-only">Download</span>
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Sparkles className="h-4 w-4" />
-                      <span className="sr-only">Translate</span>
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Headphones className="h-4 w-4" />
-                      <span className="sr-only">Text to Speech</span>
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </div>

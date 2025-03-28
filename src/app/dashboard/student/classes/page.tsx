@@ -109,13 +109,12 @@ export default function StudentClassesPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Classes</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-primary-600">My Classes</h1>
           <p className="text-gray-500">View and manage all your enrolled classes</p>
         </div>
-        <Button onClick={() => setIsJoinModalOpen(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Join New Class
-        </Button>
+        <Button variant="outline" onClick={()=>setIsJoinModalOpen(true)} className="py-4 mr-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
+        <BookOpen className="h-4 w-4 mr-2" />Join a Class
+          </Button>
       </div>
 
       {/* Search and filter */}
@@ -166,20 +165,6 @@ export default function StudentClassesPage() {
                   <div className="flex items-center text-sm">
                     <Calendar className="h-4 w-4 text-gray-500 mr-2" />
                     <span className="text-gray-700">Joined on {cls.joinedDate}</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <Clock className="h-4 w-4 text-gray-500 mr-2" />
-                    <span className="text-gray-700">Last active: {cls.lastActive}</span>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <h4 className="text-sm font-medium mb-2">Next Assignment</h4>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">{cls.nextAssignment}</span>
-                      <Badge variant="outline" className="text-xs">
-                        Due {cls.nextAssignmentDue}
-                      </Badge>
-                    </div>
                   </div>
                 </div>
               </CardContent>

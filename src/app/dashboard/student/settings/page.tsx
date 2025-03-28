@@ -43,7 +43,7 @@ export default function StudentSettingsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-primary-600">Settings</h1>
           <p className="text-gray-500">Manage your account settings and preferences</p>
         </div>
       </div>

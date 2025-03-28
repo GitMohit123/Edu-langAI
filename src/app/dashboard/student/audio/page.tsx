@@ -21,6 +21,7 @@ import {
   X,
   Check,
   Loader2,
+  FileAudio2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -261,25 +262,16 @@ export default function StudentAudioPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Text to Speech</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-primary-600">Text to Speech</h1>
           <p className="text-gray-500">Listen to your materials in multiple languages</p>
         </div>
-        <Button onClick={() => setIsUploadDialogOpen(true)} className="flex items-center gap-2">
-          <Upload className="h-4 w-4" />
+        <Button onClick={() => setIsUploadDialogOpen(true)} className="flex items-center gap-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
+          <Headphones className="h-4 w-4" />
           Upload PDF for Audio
         </Button>
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="library">My Audio Library</TabsTrigger>
-          <TabsTrigger value="player">Audio Player</TabsTrigger>
-        </TabsList>
-
-        {/* Audio Library Tab */}
-        <TabsContent value="library" className="space-y-6">
-          {/* Search and filter */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      {/* Search and filter */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
@@ -333,10 +325,13 @@ export default function StudentAudioPage() {
                       <Badge variant="outline" className="mb-2">
                         {audio.voiceLanguage} Voice
                       </Badge>
+                      <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">{audio.size}</span>
                       <Badge variant="secondary" className="h-6">
                         <Headphones className="h-3 w-3 mr-1" />
                         {audio.duration}
                       </Badge>
+                      </div>
                     </div>
                     <CardTitle className="text-lg">{audio.name}</CardTitle>
                     <CardDescription>Original: {audio.originalName}</CardDescription>
@@ -353,18 +348,18 @@ export default function StudentAudioPage() {
                           {audio.voiceType} Voice • {audio.voiceLanguage}
                         </span>
                       </div>
-                      <div className="flex items-center text-sm">
+                      {/* <div className="flex items-center text-sm">
                         <Calendar className="h-4 w-4 text-gray-500 mr-2" />
                         <span className="text-gray-700">Created: {audio.createdDate}</span>
                       </div>
                       <div className="flex items-center text-sm">
                         <Clock className="h-4 w-4 text-gray-500 mr-2" />
                         <span className="text-gray-700">Last played: {audio.lastPlayed}</span>
-                      </div>
+                      </div> */}
 
-                      <div className="flex justify-between items-center pt-4">
-                        <span className="text-sm text-gray-500">{audio.size}</span>
-                        <div className="flex gap-2">
+                      <div className="flex justify-center items-center pt-4">
+                        
+                        <div className="flex gap-2 items-center justify-between w-full">
                           <Button
                             variant="outline"
                             size="sm"
@@ -383,6 +378,7 @@ export default function StudentAudioPage() {
                               </>
                             )}
                           </Button>
+                          <div className="flex space-x-2 items-center">
                           <Button variant="outline" size="sm" className="flex items-center gap-1">
                             <Download className="h-4 w-4" />
                             <span className="sr-only md:not-sr-only md:inline">Download</span>
@@ -396,6 +392,7 @@ export default function StudentAudioPage() {
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only md:not-sr-only md:inline">Delete</span>
                           </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -420,156 +417,6 @@ export default function StudentAudioPage() {
               </Button>
             </div>
           )}
-        </TabsContent>
-
-        {/* Audio Player Tab */}
-        <TabsContent value="player" className="space-y-6">
-          {currentAudio ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>{currentAudio.name}</CardTitle>
-                <CardDescription>
-                  {currentAudio.class} • {currentAudio.voiceLanguage} {currentAudio.voiceType} Voice
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex justify-center">
-                  <div className="w-32 h-32 rounded-full bg-primary-50 flex items-center justify-center">
-                    <Volume2 className="h-16 w-16 text-primary-600" />
-                  </div>
-                </div>
-
-                {/* Audio controls */}
-                <div className="space-y-4">
-                  {/* Progress bar */}
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <Slider
-                        value={[currentTime]}
-                        max={convertDurationToSeconds(currentAudio.duration)}
-                        step={1}
-                        onValueChange={(value) => setCurrentTime(value[0])}
-                        className="cursor-pointer"
-                      />
-                    </div>
-                    <div className="flex justify-between text-sm text-gray-500">
-                      <span>{formatTime(currentTime)}</span>
-                      <span>{currentAudio.duration}</span>
-                    </div>
-                  </div>
-
-                  {/* Playback controls */}
-                  <div className="flex justify-center items-center gap-4">
-                    <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-                      <SkipBack className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      className="rounded-full h-14 w-14 flex items-center justify-center"
-                      onClick={() => setIsPlaying(!isPlaying)}
-                    >
-                      {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-1" />}
-                    </Button>
-                    <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-                      <SkipForward className="h-5 w-5" />
-                    </Button>
-                  </div>
-
-                  {/* Volume and speed controls */}
-                  <div className="grid grid-cols-2 gap-8 pt-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm">Volume</Label>
-                        <span className="text-xs text-gray-500">{volume}%</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Volume2 className="h-4 w-4 text-gray-500" />
-                        <Slider value={[volume]} max={100} step={1} onValueChange={(value) => setVolume(value[0])} />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm">Playback Speed</Label>
-                        <span className="text-xs text-gray-500">{playbackRate}x</span>
-                      </div>
-                      <Select
-                        value={playbackRate.toString()}
-                        onValueChange={(value) => setPlaybackRate(Number.parseFloat(value))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Speed" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="0.5">0.5x</SelectItem>
-                          <SelectItem value="0.75">0.75x</SelectItem>
-                          <SelectItem value="1">1x (Normal)</SelectItem>
-                          <SelectItem value="1.25">1.25x</SelectItem>
-                          <SelectItem value="1.5">1.5x</SelectItem>
-                          <SelectItem value="2">2x</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Audio information */}
-                <div className="rounded-lg border p-4 space-y-3">
-                  <h3 className="font-medium">Audio Information</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-500">Original Document</p>
-                      <p>{currentAudio.originalName}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Original Language</p>
-                      <p>{currentAudio.originalLanguage}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Voice Language</p>
-                      <p>{currentAudio.voiceLanguage}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Voice Type</p>
-                      <p>{currentAudio.voiceType}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">File Size</p>
-                      <p>{currentAudio.size}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Created Date</p>
-                      <p>{currentAudio.createdDate}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Download className="h-4 w-4" />
-                  Download Audio
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                  onClick={() => handleDelete(currentAudio)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete Audio
-                </Button>
-              </CardFooter>
-            </Card>
-          ) : (
-            <div className="text-center py-12">
-              <Headphones className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No audio selected</h3>
-              <p className="text-gray-500 mb-4">Select an audio from your library to play it here</p>
-              <Button onClick={() => setActiveTab("library")} className="mx-auto">
-                Go to Library
-              </Button>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
 
       {/* Upload PDF Dialog */}
       <Dialog open={isUploadDialogOpen} onOpenChange={resetUploadDialog}>
