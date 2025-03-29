@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { BookOpen, FileText, Headphones, Sparkles, Plus, ArrowRight, Download } from "lucide-react"
@@ -11,7 +11,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { JoinClassModal } from "@/components/Dashboard/join-class-modal"
-
+import { useUserContext } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 // Sample data
 const initialClasses = [
   {
@@ -54,7 +55,35 @@ export default function StudentDashboardPage() {
   const [classCode, setClassCode] = useState("")
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
   const [classes, setClasses] = useState(initialClasses)
-  const [recentlyJoinedClass, setRecentlyJoinedClass] = useState<string | null>(null)
+  const [recentlyJoinedClass, setRecentlyJoinedClass] = useState<string | null>(null);
+  const {user, setUser} = useUserContext();
+  const router = useRouter();
+  console.log(user);
+ 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('/api/auth/user', {
+          method: 'GET',
+          credentials: 'include', // Include cookies in the request
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch user details');
+        }
+  
+        const userData = await response.json();
+        if(userData.session.role === "student"){
+          setUser(userData.session);
+        }else{
+          router.push("/dashboard/professor");
+        } 
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+    fetchUserDetails();
+  }, []);
 
   const handleJoinClass = (code: string) => {
     // In a real app, this would fetch class details from the server
@@ -86,7 +115,7 @@ export default function StudentDashboardPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-primary-600">Student Dashboard</h1>
-          <p className="text-gray-500">Welcome back, Jane! Here are your classes and recent materials.</p>
+          <p className="text-gray-500">Welcome back, {user?.name} Here are your classes and recent materials.</p>
         </div>
         <Button variant="outline" onClick={handleJoinClassSubmit} className="py-4 mr-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
         <BookOpen className="h-4 w-4 mr-2" />Join a Class

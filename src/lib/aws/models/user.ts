@@ -16,7 +16,7 @@ export interface UserCreateInput {
   password: string;
   name: string;
   role: string;
-  tokensAvailable: number;
+  tokensAvailable?: number;
 }
 
 export interface UserUpdateInput {

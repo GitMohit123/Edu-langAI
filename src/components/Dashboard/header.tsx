@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { NotificationDropdown } from "@/components/Dashboard/notification-dropdown"
-
+import { useRouter } from "next/navigation";
 interface HeaderProps {
   role: "professor" | "student"
   userName: string
@@ -25,11 +25,21 @@ interface HeaderProps {
 }
 
 export function Header({ role, userName, email = "user@example.com" }: HeaderProps) {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Searching for:", searchQuery)
+  }
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      }).then(() => {
+      router.push('/auth/login')
+    })
   }
 
   const initials = userName
@@ -130,7 +140,7 @@ export function Header({ role, userName, email = "user@example.com" }: HeaderPro
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="text-red-600 hover:text-red-700 focus:text-red-700">
-              <Link href="/auth/login" className="cursor-pointer">
+              <Link href="/auth/login" className="cursor-pointer" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </Link>

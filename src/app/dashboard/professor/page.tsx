@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { BookOpen, FileText, Users, Plus, ArrowRight, Sparkles, Copy } from "lucide-react"
@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { CreateClassModal } from "@/components/Dashboard/create-class-modal"
-
+import { useUserContext } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 // Sample data
 const initialClasses = [
   { id: "cls1", name: "Introduction to Linguistics", students: 28, materials: 12, code: "LING101" },
@@ -40,6 +41,8 @@ export default function ProfessorDashboardPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [classes, setClasses] = useState(initialClasses)
   const [recentlyCreatedClass, setRecentlyCreatedClass] = useState<string | null>(null)
+  const {user, setUser} = useUserContext();
+  const router = useRouter();
 
   const handleCreateClass = (classData: any) => {
     const newClass = {
@@ -58,6 +61,30 @@ export default function ProfessorDashboardPage() {
       setRecentlyCreatedClass(null)
     }, 5000)
   }
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('/api/auth/user', {
+          method: 'GET',
+          credentials: 'include', // Include cookies in the request
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch user details');
+        }
+  
+        const userData = await response.json();
+        if(userData.session.role === "professor"){
+          setUser(userData.session);
+        }else{
+          router.push("/dashboard/student");
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+    fetchUserDetails();
+  }, []);
 
   return (
     <div className="space-y-6">

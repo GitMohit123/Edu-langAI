@@ -15,27 +15,53 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GraduationCap, BookOpen, ArrowRight, Loader2, ArrowLeft, Sparkles } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useUserContext } from "@/context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [role, setRole] = useState("student")
+  const {user, setUser} = useUserContext();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      // Redirect to appropriate dashboard based on role
-      if (role === "professor") {
-        router.push("/dashboard/professor")
-      } else {
-        router.push("/dashboard/student")
+    const target = e.target as HTMLFormElement;
+    const userInput = {
+      email: (target.elements.namedItem("email") as HTMLInputElement).value,
+      password: (target.elements.namedItem("password") as HTMLInputElement).value,
+    };
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userInput),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
       }
-    }, 1500)
+
+      const data = await response.json();
+      setUser(data.user);
+
+      setIsLoading(false);
+      // Redirect to appropriate dashboard based on role
+      if (data.user.role === "professor") {
+        router.push("/dashboard/professor");
+      } else {
+        router.push("/dashboard/student");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error logging in:", error);
+      // Handle error (e.g., show a notification)
+    }
   }
 
   const handleGoogleLogin = () => {

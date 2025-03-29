@@ -1,11 +1,8 @@
-import type { Metadata } from "next";
-import { Urbanist } from "next/font/google";
-import "@/app/globals.css";
 
-const urbanist = Urbanist({
-  variable: "--font-urbanist",
-  subsets: ["latin"],
-});
+import type { Metadata } from "next";
+import "@/app/globals.css";
+import { UserProvider } from "@/context/UserContext";
+
 
 export const metadata: Metadata = {
   title: "EduLang - Breaking Language Barriers in Education with AI",
@@ -22,9 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${urbanist.variable} antialiased`}
+        className={`antialiased`}
       >
-        {children}
+        <UserProvider>
+          {children}
+        </UserProvider>
       </body>
     </html>
   );

@@ -13,28 +13,55 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GraduationCap, BookOpen, ArrowRight, Loader2, ArrowLeft, Sparkles } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import { useUserContext } from "@/context/UserContext"
 
 export default function SignupPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const [role, setRole] = useState("student")
+  const [role, setRole] = useState("student");
+  const {user, setUser} = useUserContext();
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
+    const target = e.target as HTMLFormElement;
+    const userInput = {
+      email: (target.elements.namedItem("email") as HTMLInputElement).value,
+      password: (target.elements.namedItem("password") as HTMLInputElement).value,
+      name: (target.elements.namedItem("name") as HTMLInputElement).value,
+      role: role,
+    };
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userInput),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setUser(data);
+
+      setIsLoading(false);
       // Redirect to appropriate dashboard based on role
       if (role === "professor") {
-        router.push("/dashboard/professor")
+        router.push("/dashboard/professor");
       } else {
-        router.push("/dashboard/student")
+        router.push("/dashboard/student");
       }
-    }, 1500)
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error creating user:", error);
+      // Handle error (e.g., show a notification)
+    }
   }
 
   const handleGoogleSignup = () => {
