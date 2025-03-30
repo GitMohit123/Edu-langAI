@@ -20,10 +20,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface CreateClassModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreateClass: (classData: any) => void
+  setFetchState: ((fetch:boolean)=>void)
+  fetchState: boolean
 }
 
-export function CreateClassModal({ isOpen, onClose, onCreateClass }: CreateClassModalProps) {
+export function CreateClassModal({ isOpen, onClose, setFetchState, fetchState }: CreateClassModalProps) {
   const [step, setStep] = useState(1)
   const [isCreating, setIsCreating] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
@@ -45,26 +46,43 @@ export function CreateClassModal({ isOpen, onClose, onCreateClass }: CreateClass
     return `${prefix}-${randomPart}`
   }
 
-  const handleCreateClass = () => {
-    if (!className.trim()) return
+  const handleCreateClass = async () => {
+    if (!className.trim()) {
+      console.error('Class name is required');
+      return;
+    }
 
-    setIsCreating(true)
+    setIsCreating(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const newClassCode = generateClassCode()
-      setClassCode(newClassCode)
-      setIsCreating(false)
-      setStep(2)
+    const newClassCode = generateClassCode();
+    setClassCode(newClassCode);
+    try {
+      const response : any = await fetch('/api/class/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: className,
+          description,
+          subject,
+          code: newClassCode,
+        }),
+      });
 
-      // In a real app, you would save the class to the database here
-      onCreateClass({
-        name: className,
-        description,
-        subject,
-        code: newClassCode,
-      })
-    }, 1500)
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Failed to create class:', errorData.message || 'Unknown error');
+        return;
+      }
+      setFetchState(!fetchState); // Explicitly type 'prev' as boolean
+
+      setStep(2);
+    } catch (error) {
+      console.error('Error occurred while creating class:', error);
+    } finally {
+      setIsCreating(false);
+    }
   }
 
   const copyClassCode = () => {

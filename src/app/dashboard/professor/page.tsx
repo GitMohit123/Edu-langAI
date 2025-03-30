@@ -3,64 +3,69 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { BookOpen, FileText, Users, Plus, ArrowRight, Sparkles, Copy } from "lucide-react"
+import { BookOpen, FileText, Users, Plus, ArrowRight, Sparkles, Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { CreateClassModal } from "@/components/Dashboard/create-class-modal"
 import { useUserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-// Sample data
-const initialClasses = [
-  { id: "cls1", name: "Introduction to Linguistics", students: 28, materials: 12, code: "LING101" },
-  { id: "cls2", name: "Advanced Spanish Literature", students: 15, materials: 8, code: "SPAN401" },
-  { id: "cls3", name: "Comparative World Languages", students: 22, materials: 10, code: "LANG220" },
-]
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 
-const recentActivities = [
-  { id: 1, type: "join", student: "Emma Thompson", class: "Introduction to Linguistics", time: "2 hours ago" },
-  {
-    id: 2,
-    type: "download",
-    student: "Michael Chen",
-    class: "Advanced Spanish Literature",
-    material: "Week 5 Lecture Notes",
-    time: "Yesterday",
-  },
-  {
-    id: 3,
-    type: "translation",
-    student: "Sofia Rodriguez",
-    class: "Comparative World Languages",
-    language: "Portuguese",
-    time: "2 days ago",
-  },
-]
+interface Class {
+  classId: string;
+  title: string;
+  code: string;
+  description: string;
+  subject: string;
+}
 
 export default function ProfessorDashboardPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [classes, setClasses] = useState(initialClasses)
-  const [recentlyCreatedClass, setRecentlyCreatedClass] = useState<string | null>(null)
-  const {user, setUser} = useUserContext();
+  const [classes, setClasses] = useState<Class[]>([]);
+  const { user, setUser } = useUserContext();
   const router = useRouter();
+  const [fetchState, setFetchState] = useState(false);
+  const [showTickMap, setShowTickMap] = useState<Record<string, boolean>>({})
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
-  const handleCreateClass = (classData: any) => {
-    const newClass = {
-      id: `cls${classes.length + 1}`,
-      name: classData.name,
-      students: 0,
-      materials: 0,
-      code: classData.code,
-    }
-
-    setClasses([...classes, newClass])
-    setRecentlyCreatedClass(newClass.id)
-
-    // Reset the highlight after animation
+  const handleCopyCode = (classId: string, code: string) => {
+    navigator.clipboard.writeText(code)
+    setShowTickMap((prev) => ({ ...prev, [classId]: true }))
     setTimeout(() => {
-      setRecentlyCreatedClass(null)
-    }, 5000)
+      setShowTickMap((prev) => ({ ...prev, [classId]: false }))
+    }, 200)
   }
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchClasses = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/class/fetch', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error fetching classes:', errorData);
+          throw new Error(errorData.error || 'Failed to fetch classes');
+        }
+        const data = await response.json();
+        console.log(data);
+        setClasses(data);
+      } catch (error) {
+        console.error('An error occurred while fetching classes:', error);
+        // Optionally, you can set an error state here to display a message to the user
+      } finally {
+        setTimeout(()=>{
+          setLoading(false);
+        }, 2000);
+      }
+    }
+    fetchClasses();
+  }, [fetchState])
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -68,15 +73,15 @@ export default function ProfessorDashboardPage() {
           method: 'GET',
           credentials: 'include', // Include cookies in the request
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to fetch user details');
         }
-  
+
         const userData = await response.json();
-        if(userData.session.role === "professor"){
+        if (userData.session.role === "professor") {
           setUser(userData.session);
-        }else{
+        } else {
           router.push("/dashboard/student");
         }
       } catch (error) {
@@ -97,40 +102,6 @@ export default function ProfessorDashboardPage() {
           <Plus className="h-4 w-4" />
           Create New Class
         </Button>
-      </div>
-
-      {/* Stats overview */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Classes</CardTitle>
-            <BookOpen className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{classes.length}</div>
-            <p className="text-xs text-gray-500">Active classes this semester</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{classes.reduce((acc, cls) => acc + cls.students, 0)}</div>
-            <p className="text-xs text-gray-500">Students enrolled in your classes</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Materials</CardTitle>
-            <FileText className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{classes.reduce((acc, cls) => acc + cls.materials, 0)}</div>
-            <p className="text-xs text-gray-500">Documents uploaded across all classes</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Classes */}
@@ -155,118 +126,117 @@ export default function ProfessorDashboardPage() {
               </Button>
             </Card>
           </motion.div>
-          {classes.map((cls) => (
+          {loading ? (
+            <>
+              {Array.from({ length: 5 }).map((_, index) => (
+        <motion.div
+          key={`skeleton-${index}`}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          animate={{
+            backgroundColor: "#ffffff",
+            transition: { duration: 2, repeat: 2 },
+          }}
+          className="rounded-lg overflow-hidden cursor-pointer"
+        >
+          <Card className="h-full flex flex-col shadow-md transition-all duration-200">
+            <CardHeader className="pb-2 space-y-0">
+              <div className="flex items-start justify-between">
+                {/* Subject badge skeleton */}
+                <Skeleton className="h-6 w-24 mb-2 rounded-full" />
+
+                {/* Code button skeleton */}
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+
+              {/* Title skeleton */}
+              <Skeleton className="h-7 w-4/5 mt-1" />
+            </CardHeader>
+
+            <CardContent className="flex-grow pb-2">
+              {/* Description skeleton - multiple lines */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            </CardContent>
+
+            <CardFooter className="p-2">
+              {/* Manage Class button skeleton */}
+              <Skeleton className="h-10 w-full rounded-md" />
+            </CardFooter>
+          </Card>
+        </motion.div>
+      ))}
+            </>
+          ) : 
+          classes.map((cls) => (
             <motion.div
-              key={cls.id}
-              whileHover={{ y: -5 }}
+              key={cls.classId}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               animate={{
-                backgroundColor:
-                  recentlyCreatedClass === cls.id ? ["#f0f9ff", "#ffffff", "#f0f9ff", "#ffffff"] : "#ffffff",
+                backgroundColor:"#ffffff",
                 transition: { duration: 2, repeat: 2 },
               }}
-              className="rounded-lg overflow-hidden"
+              className="rounded-lg overflow-hidden cursor-pointer"
             >
-              <Card className="h-full">
-                <CardHeader className="bg-primary-50 pb-2">
-                  <div className="flex justify-between items-start">
-                    <CardTitle>{cls.name}</CardTitle>
-                    <div className="flex items-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-primary-600"
-                        onClick={() => {
-                          navigator.clipboard.writeText(cls.code)
-                          // You could add a toast notification here
-                        }}
-                      >
-                        <Copy className="h-3.5 w-3.5 mr-1" />
-                        Copy Code
-                      </Button>
-                    </div>
-                  </div>
-                  <CardDescription>Class Code: {cls.code}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Students</span>
-                      <span className="font-medium">{cls.students}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Materials</span>
-                      <span className="font-medium">{cls.materials}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Engagement</span>
-                        <span className="font-medium">78%</span>
-                      </div>
-                      <Progress value={78} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t bg-gray-50 px-6 py-3">
-                  <Link
-                    href={`/dashboard/professor/classes/${cls.id}`}
-                    className="flex w-full items-center justify-center text-sm font-medium text-primary-600 hover:text-primary-700"
-                  >
-                    Manage Class
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </CardFooter>
-              </Card>
+              <Card
+          key={cls.classId}
+          className={`h-full flex flex-col shadow-md transition-all duration-200 `}
+        >
+          <CardHeader className="pb-2 space-y-0">
+            <div className="flex items-start justify-between">
+              <Badge variant="outline" className="mb-2 bg-blue-50 text-[#3b82f6] border-blue-200">
+                {cls.subject}
+              </Badge>
+              <button
+                onClick={() => handleCopyCode(cls.classId, cls.code)}
+                className="inline-flex items-center text-xs text-gray-500 hover:text-[#3b82f6] transition-colors"
+                aria-label={`Copy class code ${cls.code}`}
+              >
+                {showTickMap[cls.classId] ? (
+                  <Check className="h-3.5 w-3.5 mr-1 text-green-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 mr-1" />
+                )}
+                Code: {cls.code}
+              </button>
+            </div>
+            <CardTitle className="text-xl font-semibold text-[#3b82f6]">{cls.title}</CardTitle>
+          </CardHeader>
+
+          <CardContent className="flex-grow pb-2">
+            <p className="text-sm text-gray-600">{cls.description}</p>
+          </CardContent>
+
+          <CardFooter className="p-2">
+            <Link href={`/dashboard/professor/classes/${cls.classId}`} className="w-full" onMouseEnter={() => setHoveredCard(cls.classId)} onMouseLeave={() => setHoveredCard(null)}>
+              <div
+                className={`flex w-full items-center justify-center py-3 text-sm font-medium rounded-md transition-colors ${
+                  hoveredCard === cls.classId
+                    ? "bg-blue-50 text-[#3b82f6] border border-blue-500"
+                    : "bg-gray-50 text-gray-700 border border-gray-200"
+                }`}
+              >
+                Manage Class
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
+            </Link>
+          </CardFooter>
+        </Card>
             </motion.div>
-          ))}
+          ))
+          }
         </div>
       </div>
-
-      {/* Recent Activity */}
-      {/* <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Recent Activity</h2>
-          <Link href="/dashboard/professor/activity" className="text-sm text-primary-600 hover:text-primary-700">
-            View all
-          </Link>
-        </div>
-        <Card>
-          <CardContent className="p-0">
-            <div className="divide-y">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-4 p-4">
-                  <div className="rounded-full bg-primary-50 p-2">
-                    {activity.type === "join" && <Users className="h-4 w-4 text-primary-600" />}
-                    {activity.type === "download" && <FileText className="h-4 w-4 text-primary-600" />}
-                    {activity.type === "translation" && <Sparkles className="h-4 w-4 text-primary-600" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">
-                      {activity.student} {activity.type === "join" && "joined your class"}
-                      {activity.type === "download" && "downloaded a material"}
-                      {activity.type === "translation" && "requested a translation"}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {activity.class}
-                      {activity.material && ` - ${activity.material}`}
-                      {activity.language && ` - to ${activity.language}`}
-                    </p>
-                    <p className="text-xs text-gray-400">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div> */}
 
       {/* Create Class Modal */}
       <CreateClassModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onCreateClass={handleCreateClass}
+        setFetchState={setFetchState}
+        fetchState={fetchState}
       />
     </div>
   )
 }
-

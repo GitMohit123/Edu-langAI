@@ -18,35 +18,50 @@ import {
 interface JoinClassModalProps {
   isOpen: boolean
   onClose: () => void
-  onJoinClass: (classCode: string) => void
+  setJoinClassStatus: (status: boolean) => void
+  joinClassStatus: boolean
 }
 
-export function JoinClassModal({ isOpen, onClose, onJoinClass }: JoinClassModalProps) {
+export function JoinClassModal({ isOpen, onClose, setJoinClassStatus, joinClassStatus }: JoinClassModalProps) {
   const [classCode, setClassCode] = useState("")
   const [isJoining, setIsJoining] = useState(false)
   const [error, setError] = useState("")
 
-  const handleJoinClass = () => {
+  const handleJoinClass = async () => {
     if (!classCode.trim()) return
 
     setIsJoining(true)
     setError("")
 
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would validate the class code on the server
-      // For demo purposes, we'll accept any code that follows our format
-      const isValidFormat = /^[A-Z]{4}-[A-Z0-9]{5}$/.test(classCode)
+    // Validate class code format
+    const isValidFormat = /^[A-Z]{4}-[A-Z0-9]{5}$/.test(classCode)
 
-      if (isValidFormat) {
-        onJoinClass(classCode)
-        setIsJoining(false)
-        onClose()
-      } else {
-        setError("Invalid class code format. Please check and try again.")
-        setIsJoining(false)
+    if (isValidFormat) {
+      try {
+        const response = await fetch('/api/class/join-class', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ classCode }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setError(errorData.error || 'Failed to join class. Please try again.');
+        } else {
+          setJoinClassStatus(!joinClassStatus);
+          onClose();
+        }
+      } catch (error) {
+        setError('An error occurred while joining the class. Please try again.');
+      } finally {
+        setIsJoining(false);
       }
-    }, 1500)
+    } else {
+      setError("Invalid class code format. Please check and try again.");
+      setIsJoining(false);
+    }
   }
 
   const handleClose = () => {
