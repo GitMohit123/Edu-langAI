@@ -219,7 +219,7 @@ export default function HeroSection() {
               <div className="absolute inset-0 bg-gradient-to-tr from-primary-500/10 to-transparent" />
 
               {/* Bottom blur gradient */}
-              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/80 to-transparent backdrop-blur-sm" />
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/80 to-transparent backdrop-blur-sm hidden md:block" />
 
               {/* AI Translation Active badge */}
               <motion.div
@@ -252,19 +252,6 @@ export default function HeroSection() {
                   }}
                 />
               </div>
-            </div>
-          </motion.div>
-
-          {/* Integration logos */}
-          <motion.div className="mt-16 text-center" variants={itemVariants}>
-            <p className="text-sm text-gray-500 mb-4">Works with your favorite education platforms</p>
-            <div className="flex flex-wrap justify-center items-center gap-8">
-              {educationIcons.slice(0, 5).map((item, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div className="bg-white p-2 rounded-lg shadow-sm">{item.icon}</div>
-                  <span className="text-xs text-gray-500 mt-2">{item.name}</span>
-                </div>
-              ))}
             </div>
           </motion.div>
         </motion.div>

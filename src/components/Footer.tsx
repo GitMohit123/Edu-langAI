@@ -8,7 +8,7 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Send, ArrowUpRight, CheckCircle2 } from "lucide-react"
+import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Send, ArrowUpRight, CheckCircle2, Github } from "lucide-react"
 
 export default function Footer() {
   const [email, setEmail] = useState("")
@@ -58,31 +58,13 @@ export default function Footer() {
 
             <div className="flex items-center space-x-5 mb-8">
               <motion.a
-                href="#"
+                href="https://github.com/GitMohit123/Edu-langAI"
                 className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-500 transition-colors duration-300"
                 whileHover={{ y: -5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
-              </motion.a>
-              <motion.a
-                href="#"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-500 transition-colors duration-300"
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </motion.a>
-              <motion.a
-                href="#"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-500 transition-colors duration-300"
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Instagram className="h-5 w-5" />
-                <span className="sr-only">Instagram</span>
+                <Github className="h-5 w-5" />
+                <span className="sr-only">Github</span>
               </motion.a>
               <motion.a
                 href="#"
@@ -92,15 +74,6 @@ export default function Footer() {
               >
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
-              </motion.a>
-              <motion.a
-                href="#"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-500 transition-colors duration-300"
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Youtube className="h-5 w-5" />
-                <span className="sr-only">YouTube</span>
               </motion.a>
             </div>
 

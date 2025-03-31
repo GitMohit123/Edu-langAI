@@ -156,7 +156,7 @@ export default function PricingSection() {
               variant="outline"
               className="w-full bg-transparent border-gray-300 hover:bg-gray-50 text-gray-700"
             >
-              <Link href="/signup">Start Free Trial</Link>
+              <Link href="/auth/signup">Start Free Trial</Link>
             </Button>
           </motion.div>
 
@@ -191,7 +191,7 @@ export default function PricingSection() {
             </ul>
 
             <Button asChild className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium group">
-              <Link href="/signup">
+              <Link href="/auth/signup">
                 Get Started
                 <motion.span
                   className="ml-2"

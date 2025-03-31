@@ -21,6 +21,8 @@ export default function SignupPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [role, setRole] = useState("student");
   const {user, setUser} = useUserContext();
+  const [error, setError] = useState("")
+
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -42,11 +44,22 @@ export default function SignupPage() {
         body: JSON.stringify(userInput),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        // Handle different error types based on the response
+        if (response.status === 409) {
+          setError("User already exists. Please login.")
+        } else if (response.status === 500) {
+          setError("Server error. Please try again later.")
+        } else if (data.error) {
+          setError(data.error)
+        } else {
+          setError("Login failed. Please try again later.")
+        }
+        setIsLoading(false)
+        return
       }
 
-      const data = await response.json();
       console.log(data);
       setUser(data);
 
@@ -59,6 +72,7 @@ export default function SignupPage() {
       }
     } catch (error) {
       setIsLoading(false);
+      setError("Network error. Please check your connection and try again.")
       console.error("Error creating user:", error);
       // Handle error (e.g., show a notification)
     }
@@ -131,6 +145,14 @@ export default function SignupPage() {
                 </Tabs>
               </div>
             <form onSubmit={handleSignup} className="space-y-4 mt-4">
+            {error && (
+                <div
+                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4"
+                  role="alert"
+                >
+                  <span className="block sm:inline">{error}</span>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" placeholder="your@email.com" required />
@@ -145,23 +167,10 @@ export default function SignupPage() {
               </div>
 
               <div className="flex gap-4 items-center">
-              <Button type="submit" className="w-full bg-primary-600 hover:bg-primary-700" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  <>
-                    Sign Up
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
               <Button
                 variant="outline"
                 type="button"
-                disabled={isGoogleLoading}
+                disabled
                 className="w-full"
                 onClick={handleGoogleSignup}
               >
@@ -178,6 +187,20 @@ export default function SignupPage() {
                 )}
                 {isGoogleLoading ? "Signing up..." : "Sign up with Google"}
               </Button>
+              <Button type="submit" className="w-full bg-primary-600 hover:bg-primary-700" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    Sign Up
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+              
               </div>
             </form>
           </CardContent>

@@ -96,7 +96,7 @@ export default function ProfessorDashboardPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-primary-600">Professor Dashboard</h1>
-          <p className="text-gray-500">Welcome back, Dr. Smith! Here's what's happening with your classes.</p>
+          <p className="text-gray-500">Welcome back, {user && user?.name.charAt(0).toUpperCase() + user?.name.slice(1)}! Here's what's happening with your classes.</p>
         </div>
         <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
           <Plus className="h-4 w-4" />
@@ -108,13 +108,10 @@ export default function ProfessorDashboardPage() {
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">Your Classes</h2>
-          <Link href="/dashboard/professor/classes" className="text-sm text-primary-600 hover:text-primary-700">
-            View all
-          </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* Create class card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+          <motion.div transition={{ type: "spring", stiffness: 300, damping: 20 }}>
             <Card className="flex h-full flex-col items-center justify-center border-2 border-dashed border-gray-200 p-6 text-center">
               <div className="mb-4 rounded-full bg-primary-50 p-3">
                 <Plus className="h-6 w-6 text-primary-600" />

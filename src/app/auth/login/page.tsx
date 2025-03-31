@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [role, setRole] = useState("student")
   const {user, setUser} = useUserContext();
+  const [error, setError] = useState("")
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,11 +44,22 @@ export default function LoginPage() {
         body: JSON.stringify(userInput),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error('Login failed');
+        // Handle different error types based on the response
+        if (response.status === 401) {
+          setError("Invalid email or password. Please try again.")
+        } else if (response.status === 404) {
+          setError("Account not found. Please sign up first.")
+        } else if (data.error) {
+          setError(data.error)
+        } else {
+          setError("Login failed. Please try again later.")
+        }
+        setIsLoading(false)
+        return
       }
 
-      const data = await response.json();
       setUser(data.user);
 
       setIsLoading(false);
@@ -59,6 +71,7 @@ export default function LoginPage() {
       }
     } catch (error) {
       setIsLoading(false);
+      setError("Network error. Please check your connection and try again.")
       console.error("Error logging in:", error);
       // Handle error (e.g., show a notification)
     }
@@ -112,7 +125,7 @@ export default function LoginPage() {
               <Button
                 variant="outline"
                 type="button"
-                disabled={isGoogleLoading}
+                disabled
                 className="w-full"
                 onClick={handleGoogleLogin}
               >
@@ -141,6 +154,14 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4 mt-4">
+              {error && (
+                <div
+                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4"
+                  role="alert"
+                >
+                  <span className="block sm:inline">{error}</span>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" placeholder="your@email.com" required />
@@ -150,7 +171,7 @@ export default function LoginPage() {
                 <Input id="password" type="password" required />
               </div>
 
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember" />
                   <label
@@ -163,7 +184,7 @@ export default function LoginPage() {
                 <Link href="/auth/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
                   Forgot password?
                 </Link>
-              </div>
+              </div> */}
 
               <Button type="submit" className="w-full bg-primary-600 hover:bg-primary-700" disabled={isLoading}>
                 {isLoading ? (
