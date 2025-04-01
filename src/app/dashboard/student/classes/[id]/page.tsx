@@ -9,7 +9,12 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ClassDashboardSkeletonStudent } from "@/components/Dashboard/student-dashboard-skeleton"
-
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { FileAudio } from "lucide-react"
+import { MoreVertical } from "lucide-react"
+import { TranslateDialog } from "@/components/Dashboard/translate-dialog"
+import { TextToSpeechDialog } from "@/components/Dashboard/text-to-speech-dialog"
+import { AiSummarizeDialog } from "@/components/Dashboard/ai-summarize-dialog"
 
 export default function StudentClassDetailPage() {
   const params = useParams()
@@ -17,6 +22,11 @@ export default function StudentClassDetailPage() {
   const [currentClass, setCurrentClass] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  const [translateOpen, setTranslateOpen] = useState(false)
+  const [textToSpeechOpen, setTextToSpeechOpen] = useState(false)
+  const [aiSummarizeOpen, setAiSummarizeOpen] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState<any>(null)
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -43,7 +53,20 @@ export default function StudentClassDetailPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState("english")
   const [activeTab, setActiveTab] = useState("materials")
+  const handleOpenTranslate = (document: any) => {
+    setSelectedDocument(document)
+    setTranslateOpen(true)
+  }
 
+  const handleOpenTextToSpeech = (document: any) => {
+    setSelectedDocument(document)
+    setTextToSpeechOpen(true)
+  }
+
+  const handleOpenAiSummarize = (document: any) => {
+    setSelectedDocument(document)
+    setAiSummarizeOpen(true)
+  }
   if (loading && !currentClass) {
     return <ClassDashboardSkeletonStudent />
   }
@@ -121,6 +144,28 @@ export default function StudentClassDetailPage() {
                             <SquareArrowOutUpRight className="h-4 w-4" />
                             <span className="sr-only">Text to Speech</span>
                           </Button>
+                          <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                              <span className="sr-only">More options</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenTranslate(material)}>
+                              <Languages className="mr-2 h-4 w-4" />
+                              Language Translate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleOpenTextToSpeech(material)}>
+                              <FileAudio className="mr-2 h-4 w-4" />
+                              Text-to-Speech
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleOpenAiSummarize(material)}>
+                              <Sparkles className="mr-2 h-4 w-4" />
+                              AI Summarize
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -135,6 +180,11 @@ export default function StudentClassDetailPage() {
               )}
             </CardContent>
           </Card>
+          <TranslateDialog open={translateOpen} onOpenChange={setTranslateOpen} document={selectedDocument} />
+
+      <TextToSpeechDialog open={textToSpeechOpen} onOpenChange={setTextToSpeechOpen} document={selectedDocument} />
+
+      <AiSummarizeDialog open={aiSummarizeOpen} onOpenChange={setAiSummarizeOpen} document={selectedDocument} />
     </div>
   )
 }

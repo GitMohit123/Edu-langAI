@@ -96,7 +96,7 @@ export default function ProfessorDashboardPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-primary-600">Professor Dashboard</h1>
-          <p className="text-gray-500">Welcome back, {user && user?.name.charAt(0).toUpperCase() + user?.name.slice(1)}! Here's what's happening with your classes.</p>
+          <p className="text-gray-500">Welcome back, {user && user.name ?  user?.name.charAt(0).toUpperCase() + user?.name.slice(1):"User"}! Here's what's happening with your classes.</p>
         </div>
         <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2 bg-primary-600 text-white hover:bg-primary-700 hover:text-white">
           <Plus className="h-4 w-4" />
