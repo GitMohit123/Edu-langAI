@@ -1,9 +1,7 @@
-// src/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken } from './lib/aws/auth';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const authToken = request.cookies.get('auth-token')
   
   // Protect admin routes

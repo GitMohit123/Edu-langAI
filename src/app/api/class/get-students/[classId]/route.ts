@@ -5,7 +5,10 @@ import { NextResponse } from 'next/server';
 
 const STUDENT_CLASSES_TABLE = process.env.STUDENT_CLASSES_TABLE;
 
-export async function GET(request: Request, { params }: { params: { classId: string } }) {
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ classId: string }> }
+) {
     const user = await getSession();
     const { classId } = await params;
     if (!classId) {

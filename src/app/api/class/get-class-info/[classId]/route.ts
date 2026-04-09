@@ -6,7 +6,7 @@ const CLASSES_TABLE = process.env.CLASSES_TABLE || 'dev-classes';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { classId: string } }
+  { params }: { params: Promise<{ classId: string }> }
 ) {
   const { classId } = await params;
   console.log(classId)

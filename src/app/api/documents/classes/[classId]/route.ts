@@ -5,7 +5,10 @@ import { getSession } from '@/lib/getSession';
 
 const DOCUMENTS_TABLE = process.env.DOCUMENTS_TABLE;
 
-export async function GET(request: Request, { params }: { params: { classId: string } }) {
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ classId: string }> }
+) {
     try {
         const user = await getSession();
         const { classId } = await params;
