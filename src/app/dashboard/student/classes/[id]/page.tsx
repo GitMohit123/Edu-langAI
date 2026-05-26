@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-import { BookOpen, Download, Sparkles, Headphones, Search, Filter, Languages, File, FileText, SquareArrowOutUpRight } from "lucide-react"
+import { BookOpen, Bot, Download, Sparkles, Headphones, Search, Filter, Languages, File, FileText, SquareArrowOutUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +15,7 @@ import { MoreVertical } from "lucide-react"
 import { TranslateDialog } from "@/components/Dashboard/translate-dialog"
 import { TextToSpeechDialog } from "@/components/Dashboard/text-to-speech-dialog"
 import { AiSummarizeDialog } from "@/components/Dashboard/ai-summarize-dialog"
+import { DocumentCopilotDialog } from "@/components/Dashboard/document-copilot-dialog"
 
 export default function StudentClassDetailPage() {
   const params = useParams()
@@ -26,6 +27,7 @@ export default function StudentClassDetailPage() {
   const [translateOpen, setTranslateOpen] = useState(false)
   const [textToSpeechOpen, setTextToSpeechOpen] = useState(false)
   const [aiSummarizeOpen, setAiSummarizeOpen] = useState(false)
+  const [documentCopilotOpen, setDocumentCopilotOpen] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<any>(null)
   useEffect(() => {
     const fetchClassData = async () => {
@@ -66,6 +68,10 @@ export default function StudentClassDetailPage() {
   const handleOpenAiSummarize = (document: any) => {
     setSelectedDocument(document)
     setAiSummarizeOpen(true)
+  }
+  const handleOpenDocumentCopilot = (document: any) => {
+    setSelectedDocument(document)
+    setDocumentCopilotOpen(true)
   }
   if (loading && !currentClass) {
     return <ClassDashboardSkeletonStudent />
@@ -164,6 +170,10 @@ export default function StudentClassDetailPage() {
                               <Sparkles className="mr-2 h-4 w-4" />
                               AI Summarize
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleOpenDocumentCopilot(material)}>
+                              <Bot className="mr-2 h-4 w-4" />
+                              Ask AI Copilot
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                         </div>
@@ -185,6 +195,8 @@ export default function StudentClassDetailPage() {
       <TextToSpeechDialog open={textToSpeechOpen} onOpenChange={setTextToSpeechOpen} document={selectedDocument} />
 
       <AiSummarizeDialog open={aiSummarizeOpen} onOpenChange={setAiSummarizeOpen} document={selectedDocument} />
+
+      <DocumentCopilotDialog open={documentCopilotOpen} onOpenChange={setDocumentCopilotOpen} document={selectedDocument} />
     </div>
   )
 }

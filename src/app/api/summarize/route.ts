@@ -4,12 +4,15 @@ import {
   extractDocumentText,
   splitTextIntoChunks,
 } from "@/lib/document-text";
+import {
+  callOpenRouterChat,
+  GEMINI_FLASH_LABEL,
+  GEMINI_FLASH_MODEL,
+  type OpenRouterChatMessage,
+} from "@/lib/openrouter";
 
-const OPENROUTER_URL =
-  "https://openrouter.ai/api/v1/chat/completions";
-const SUMMARY_MODEL = "google/gemini-3.5-flash";
-const SUMMARY_MODEL_LABEL =
-  "Gemini 3.5 Flash via OpenRouter";
+const SUMMARY_MODEL = GEMINI_FLASH_MODEL;
+const SUMMARY_MODEL_LABEL = GEMINI_FLASH_LABEL;
 const MAX_SUMMARY_INPUT_CHARS = 12000;
 
 type SummarizeRequest = {
@@ -17,11 +20,6 @@ type SummarizeRequest = {
   fileName?: string;
   length?: number;
   type?: "concise" | "detailed" | "bullet" | "academic";
-};
-
-type ChatMessage = {
-  role: "system" | "user";
-  content: string;
 };
 
 const getSummaryTypeInstruction = (
@@ -53,87 +51,6 @@ const clampSummaryLength = (value?: number) => {
 const estimateTargetWords = (summaryLength: number) =>
   Math.round(120 + ((summaryLength - 10) / 80) * 580);
 
-const extractAssistantText = (content: unknown) => {
-  if (typeof content === "string") {
-    return content.trim();
-  }
-
-  if (Array.isArray(content)) {
-    return content
-      .map((part) => {
-        if (
-          part &&
-          typeof part === "object" &&
-          "type" in part &&
-          "text" in part &&
-          part.type === "text"
-        ) {
-          return String(part.text);
-        }
-
-        return "";
-      })
-      .join("")
-      .trim();
-  }
-
-  return "";
-};
-
-async function callOpenRouter(messages: ChatMessage[]) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "OPENROUTER_API_KEY is not configured"
-    );
-  }
-
-  const response = await fetch(OPENROUTER_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: SUMMARY_MODEL,
-      temperature: 0.2,
-      max_tokens: 1200,
-      messages,
-    }),
-  });
-
-  const responseText = await response.text();
-  let data: any = {};
-
-  try {
-    data = responseText ? JSON.parse(responseText) : {};
-  } catch {
-    data = {
-      message: responseText,
-    };
-  }
-
-  if (!response.ok) {
-    const errorMessage =
-      data?.error?.message ||
-      data?.message ||
-      "OpenRouter request failed";
-
-    throw new Error(errorMessage);
-  }
-
-  const summary = extractAssistantText(
-    data?.choices?.[0]?.message?.content
-  );
-
-  if (!summary) {
-    throw new Error("OpenRouter returned an empty summary");
-  }
-
-  return summary;
-}
-
 async function summarizeChunk(
   text: string,
   summaryType: NonNullable<SummarizeRequest["type"]>,
@@ -141,7 +58,7 @@ async function summarizeChunk(
   chunkIndex: number,
   totalChunks: number
 ) {
-  return callOpenRouter([
+  const messages: OpenRouterChatMessage[] = [
     {
       role: "system",
       content:
@@ -158,7 +75,15 @@ Create an intermediate summary of this chunk in 120 to 180 words. Focus on the m
 Chunk text:
 ${text}`,
     },
-  ]);
+  ];
+
+  const { text: summary } = await callOpenRouterChat({
+    model: SUMMARY_MODEL,
+    messages,
+    maxTokens: 500,
+  });
+
+  return summary;
 }
 
 async function summarizeDocument(
@@ -195,7 +120,7 @@ async function summarizeDocument(
     sourceForFinalSummary = chunkSummaries.join("\n\n");
   }
 
-  const summary = await callOpenRouter([
+  const messages: OpenRouterChatMessage[] = [
     {
       role: "system",
       content:
@@ -214,7 +139,13 @@ Do not use markdown tables. Do not mention that you are an AI model. Return only
 Source material:
 ${sourceForFinalSummary}`,
     },
-  ]);
+  ];
+
+  const { text: summary } = await callOpenRouterChat({
+    model: SUMMARY_MODEL,
+    messages,
+    maxTokens: 1200,
+  });
 
   return {
     summary,

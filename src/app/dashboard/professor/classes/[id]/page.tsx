@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { FileText, Users, Plus, Share2, Download, Clock, BarChart, FileUp, Sparkles, Headphones } from "lucide-react"
+import { Bot, FileText, Users, Plus, Share2, Download, Clock, BarChart, FileUp, Sparkles, Headphones } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ClassDashboardSkeleton } from "@/components/Dashboard/professor-dashboard-skeleton"
 import { motion } from "framer-motion"
 import { FileUpload } from "@/components/Dashboard/file-upload"
+import { DocumentCopilotDialog } from "@/components/Dashboard/document-copilot-dialog"
 
 
 export default function ClassDetailPage() {
@@ -24,6 +25,8 @@ export default function ClassDetailPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [documentCopilotOpen, setDocumentCopilotOpen] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState<any>(null)
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -147,9 +150,16 @@ export default function ClassDetailPage() {
                                 <Download className="h-4 w-4" />
                                 <span className="sr-only">Download</span>
                               </Button>
-                              <Button variant="ghost" size="sm">
-                                <Sparkles className="h-4 w-4" />
-                                <span className="sr-only">AI Tools</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedDocument(material)
+                                  setDocumentCopilotOpen(true)
+                                }}
+                              >
+                                <Bot className="h-4 w-4" />
+                                <span className="sr-only">Ask AI Copilot</span>
                               </Button>
                             </div>
                           </TableCell>
@@ -181,6 +191,11 @@ export default function ClassDetailPage() {
           setIsUploadModalOpen(false)
         }}
         classId={classId}
+      />
+      <DocumentCopilotDialog
+        open={documentCopilotOpen}
+        onOpenChange={setDocumentCopilotOpen}
+        document={selectedDocument}
       />
       </div>
     )
