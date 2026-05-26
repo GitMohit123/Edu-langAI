@@ -42,19 +42,39 @@ const languages = [
   { value: "hi", label: "Hindi" },
 ];
 
+interface TranslateDocumentResponse {
+  success: boolean;
+  error?: string;
+  extractedText?: string;
+  translatedText?: string;
+  targetLanguage?: string;
+}
+
 export function TranslateDialog({
   open,
   onOpenChange,
   document,
 }: TranslateDialogProps) {
   const [targetLanguage, setTargetLanguage] = useState("es");
-  const [extracting, setExtracting] = useState(false);
-  const [translating, setTranslating] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [translatedText, setTranslatedText] = useState("");
   const [extractedText, setExtractedText] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     setTranslatedText("");
-  }, [targetLanguage]);
+    setExtractedText("");
+    setErrorMessage("");
+  }, [targetLanguage, document?.fileUrl]);
+
+  useEffect(() => {
+    if (!open) {
+      setTranslatedText("");
+      setExtractedText("");
+      setErrorMessage("");
+      setIsTranslating(false);
+    }
+  }, [open]);
 
   // Setup react-to-pdf hook
   const { toPDF, targetRef } = usePDF({
@@ -68,65 +88,54 @@ export function TranslateDialog({
   });
 
   const handleTranslate = async () => {
-    if (!document) return;
+    if (!document?.fileUrl) {
+      setErrorMessage("This document is missing a valid file URL.");
+      return;
+    }
 
     try {
-      // Step 1: Extract text from document
-      setExtracting(true);
-      const extractionResponse = await fetch(
-        "/api/ai-documents/text-extraction",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            s3FileUrl: document.fileUrl,
-          }),
-        }
-      );
+      setIsTranslating(true);
+      setTranslatedText("");
+      setExtractedText("");
+      setErrorMessage("");
 
-      if (!extractionResponse.ok) {
-        throw new Error("Text extraction failed");
-      }
-
-      const extractionData = await extractionResponse.json();
-      console.log(extractionData);
-      const extractedText =
-        extractionData.extracted_text ||
-        "No text could be extracted from the document.";
-      setExtractedText(extractedText);
-      setExtracting(false);
-
-      // Step 2: Translate the extracted text
-      setTranslating(true);
-      const translationResponse = await fetch("/api/ai-documents/translate", {
+      const translationResponse = await fetch("/api/translate-documents", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: extractedText,
-          target_language: targetLanguage,
+          s3FileUrl: document.fileUrl,
+          targetLanguage,
         }),
       });
 
-      if (!translationResponse.ok) {
-        throw new Error("Translation failed");
+      const translationData =
+        (await translationResponse.json()) as TranslateDocumentResponse;
+
+      if (!translationResponse.ok || !translationData.success) {
+        throw new Error(
+          translationData.error || "Document translation failed."
+        );
       }
 
-      const translationData = await translationResponse.json();
-      setTranslatedText(
-        translationData.translated_text || "Translation failed."
-      );
+      if (!translationData.translatedText?.trim()) {
+        throw new Error(
+          "The translation service returned an empty response."
+        );
+      }
+
+      setExtractedText(translationData.extractedText || "");
+      setTranslatedText(translationData.translatedText);
     } catch (error) {
       console.error("Error translating document:", error);
-      setTranslatedText(
-        "An error occurred during translation. Please try again."
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "An error occurred during translation. Please try again."
       );
     } finally {
-      setExtracting(false);
-      setTranslating(false);
+      setIsTranslating(false);
     }
   };
 
@@ -226,7 +235,7 @@ export function TranslateDialog({
             <Select
               value={targetLanguage}
               onValueChange={setTargetLanguage}
-              disabled={extracting || translating}
+              disabled={isTranslating}
             >
               <SelectTrigger id="targetLanguage" className="col-span-3">
                 <SelectValue placeholder="Select language" />
@@ -275,12 +284,24 @@ export function TranslateDialog({
                       readOnly
                       className="h-[300px] resize-none font-medium"
                     />
+                    {extractedText ? (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Extracted {extractedText.length.toLocaleString()}{" "}
+                        characters from the original document.
+                      </p>
+                    ) : null}
                   </div>
-                ) : extracting || translating ? (
+                ) : isTranslating ? (
                   <div className="flex flex-col items-center justify-center h-[300px] border rounded-md">
                     <Loader2 className="h-8 w-8 animate-spin mb-2" />
                     <p className="text-muted-foreground">
-                      {extracting ? "Extracting text..." : "Translating..."}
+                      Extracting text and translating document...
+                    </p>
+                  </div>
+                ) : errorMessage ? (
+                  <div className="flex items-center justify-center h-[300px] border rounded-md px-4 text-center">
+                    <p className="text-sm text-destructive">
+                      {errorMessage}
                     </p>
                   </div>
                 ) : (
@@ -300,7 +321,7 @@ export function TranslateDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             className="sm:order-1"
-            disabled={extracting || translating}
+            disabled={isTranslating}
           >
             Cancel
           </Button>
@@ -313,18 +334,13 @@ export function TranslateDialog({
           ) : (
             <Button
               onClick={handleTranslate}
-              disabled={extracting || translating}
+              disabled={isTranslating || !document?.fileUrl}
               className="sm:order-2"
             >
-              {extracting ? (
+              {isTranslating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Extracting text...
-                </>
-              ) : translating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Translating...
+                  Translating document...
                 </>
               ) : (
                 "Translate"
